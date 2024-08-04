@@ -1,4 +1,5 @@
 import './BoardLayout.css';
+import Piece from 'react-chess-pieces';
 
 const BoardLayout = ({
   positions,
@@ -25,7 +26,7 @@ const BoardLayout = ({
           onClick={() => handleSquareClick(squareKey)}
           style={{ backgroundColor: availableMove ? 'lightcoral' : isBlack ? 'gray' : 'white' }}
         >
-          {piece}
+          {piece ? <Piece piece={piece[0] === 'w' ? piece[2].toUpperCase() : piece[2]} /> : null}
         </div>
       );
     }
