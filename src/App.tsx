@@ -26,15 +26,19 @@ function App() {
     }
   };
 
+  const handleResetSelectedSquareData = () => {
+    getCurrentPositions();
+    setSelectedSquare(null);
+    setAvailableMoves([]);
+  };
+
   const handleMakeMove = async (key: string) => {
     try {
       await axios.post('http://localhost:8080/move', {
         currSquare: selectedSquare,
         newSquare: key,
       });
-      getCurrentPositions();
-      setSelectedSquare(null);
-      setAvailableMoves([]);
+      handleResetSelectedSquareData();
     } catch (err) {
       console.error(err);
     }
@@ -50,11 +54,25 @@ function App() {
     setSelectedSquare(key);
   };
 
+  const handleReset = async () => {
+    try {
+      await axios.post('http://localhost:8080/reset');
+      handleResetSelectedSquareData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     getCurrentPositions();
   }, []);
 
-  return <BoardLayout positions={positions} handleSquareClick={handleSquareClick} availableMoves={availableMoves} />;
+  return (
+    <>
+      <BoardLayout positions={positions} handleSquareClick={handleSquareClick} availableMoves={availableMoves} />
+      <button onClick={handleReset}>Reset</button>
+    </>
+  );
 }
 
 export default App;
