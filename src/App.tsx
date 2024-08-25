@@ -50,7 +50,7 @@ function App() {
       return;
     }
 
-    getAvailableMoves(key);
+    if (positions[key]) getAvailableMoves(key);
     setSelectedSquare(key);
   };
 
