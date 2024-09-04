@@ -1,15 +1,8 @@
 import './BoardLayout.css';
 import Piece from 'react-chess-pieces';
+import { BoardLayoutProps } from './type';
 
-const BoardLayout = ({
-  positions,
-  availableMoves,
-  handleSquareClick,
-}: {
-  positions: Record<string, string>;
-  availableMoves: string[] | undefined;
-  handleSquareClick: (key: string) => void;
-}) => {
+const BoardLayout = ({ isCheck, positions, availableMoves, handleSquareClick }: BoardLayoutProps) => {
   const renderSquares = () => {
     const squares = [];
     for (let i = 0; i < 64; i++) {
@@ -19,13 +12,21 @@ const BoardLayout = ({
       const squareKey = row + '-' + col;
       const piece = positions[squareKey];
       const availableMove = availableMoves?.includes(squareKey);
+      const backgroundColor = (() => {
+        if (isCheck === piece) {
+          return 'red';
+        }
+        if (availableMove) {
+          return 'lightcoral';
+        }
+        if (isBlack) {
+          return 'gray';
+        }
+        return 'white';
+      })();
+
       squares.push(
-        <div
-          key={i}
-          className='square'
-          onClick={() => handleSquareClick(squareKey)}
-          style={{ backgroundColor: availableMove ? 'lightcoral' : isBlack ? 'gray' : 'white' }}
-        >
+        <div key={i} className='square' onClick={() => handleSquareClick(squareKey)} style={{ backgroundColor }}>
           {piece ? <Piece piece={piece[0] === 'w' ? piece[2].toUpperCase() : piece[2]} /> : null}
         </div>
       );

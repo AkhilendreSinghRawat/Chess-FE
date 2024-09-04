@@ -2,16 +2,23 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios';
 import BoardLayout from './BoardLayout';
+import { CheckStatus } from './type';
 
 function App() {
   const [positions, setPositions] = useState<Record<string, string>>({});
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
   const [availableMoves, setAvailableMoves] = useState<string[]>([]);
+  const [checkStatus, setCheckStatus] = useState<CheckStatus>({
+    isCheck: false,
+    isMate: false,
+  });
 
   const getCurrentPositions = async () => {
     try {
       const res = await axios.get('http://localhost:8080/positions');
-      setPositions(res.data);
+      const { positions, isCheck, isMate } = res.data;
+      setPositions(positions);
+      setCheckStatus({ isCheck, isMate });
     } catch (err) {
       console.error(err);
     }
@@ -50,7 +57,12 @@ function App() {
       return;
     }
 
-    if (positions[key]) getAvailableMoves(key);
+    if (positions[key]) {
+      getAvailableMoves(key);
+    } else {
+      setAvailableMoves([]);
+    }
+
     setSelectedSquare(key);
   };
 
@@ -69,7 +81,13 @@ function App() {
 
   return (
     <>
-      <BoardLayout positions={positions} handleSquareClick={handleSquareClick} availableMoves={availableMoves} />
+      <BoardLayout
+        isCheck={checkStatus.isCheck}
+        positions={positions}
+        handleSquareClick={handleSquareClick}
+        availableMoves={availableMoves}
+      />
+      {checkStatus.isMate ? <div>💀 {checkStatus.isCheck} 💀</div> : null}
       <button onClick={handleReset}>Reset</button>
     </>
   );
