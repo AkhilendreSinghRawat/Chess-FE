@@ -3,6 +3,7 @@ import './App.css';
 import axios from 'axios';
 import BoardLayout from './BoardLayout';
 import { CheckStatus } from './type';
+import PromotionModal from './PromotionalModal';
 
 function App() {
   const [positions, setPositions] = useState<Record<string, string>>({});
@@ -12,6 +13,7 @@ function App() {
     isCheck: false,
     isMate: false,
   });
+  const [promotionModal, setPromotionModal] = useState<string | false>(false);
 
   const getCurrentPositions = async () => {
     try {
@@ -39,11 +41,12 @@ function App() {
     setAvailableMoves([]);
   };
 
-  const handleMakeMove = async (key: string) => {
+  const handleMakeMove = async (key: string, promotionPiece?: string) => {
     try {
       await axios.post('http://localhost:8080/move', {
         currSquare: selectedSquare,
         newSquare: key,
+        promotionPiece,
       });
       handleResetSelectedSquareData();
     } catch (err) {
@@ -53,6 +56,12 @@ function App() {
 
   const handleSquareClick = (key: string) => {
     if (selectedSquare && availableMoves.includes(key)) {
+      if (['0', '7'].includes(key[0]) && positions[selectedSquare][2] === 'p') {
+        // pawn will be promoted now
+        setPromotionModal(key);
+        return;
+      }
+
       handleMakeMove(key);
       return;
     }
@@ -75,6 +84,13 @@ function App() {
     }
   };
 
+  const handlePromotion = (promotionPiece: string) => {
+    if (!promotionModal) return console.error('Error: No promotion key was provided');
+
+    handleMakeMove(promotionModal, promotionPiece);
+    setPromotionModal(false);
+  };
+
   useEffect(() => {
     getCurrentPositions();
   }, []);
@@ -89,6 +105,11 @@ function App() {
       />
       {checkStatus.isMate ? <div>💀 {checkStatus.isCheck} 💀</div> : null}
       <button onClick={handleReset}>Reset</button>
+      <PromotionModal
+        isOpen={!!promotionModal}
+        onClose={() => setPromotionModal(false)}
+        onSelectPiece={handlePromotion}
+      />
     </>
   );
 }

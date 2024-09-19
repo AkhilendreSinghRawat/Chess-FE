@@ -37,6 +37,7 @@
   justify-content: center;
   border: 1px solid black;
   color: black;
+  cursor: pointer;
 }
 
 .label {
