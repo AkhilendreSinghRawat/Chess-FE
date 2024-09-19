@@ -14,10 +14,11 @@ function App() {
     isMate: false,
   });
   const [promotionModal, setPromotionModal] = useState<string | false>(false);
+  const BackendUrl = import.meta.env.VITE_APP_BACKEND_URL;
 
   const getCurrentPositions = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/positions');
+      const res = await axios.get(`${BackendUrl}/positions`);
       const { positions, isCheck, isMate } = res.data;
       setPositions(positions);
       setCheckStatus({ isCheck, isMate });
@@ -28,7 +29,7 @@ function App() {
 
   const getAvailableMoves = async (key: string) => {
     try {
-      const res = await axios.get(`http://localhost:8080/available-moves?key=${key}`);
+      const res = await axios.get(`${BackendUrl}/available-moves?key=${key}`);
       setAvailableMoves(res.data);
     } catch (err) {
       console.error(err);
@@ -43,7 +44,7 @@ function App() {
 
   const handleMakeMove = async (key: string, promotionPiece?: string) => {
     try {
-      await axios.post('http://localhost:8080/move', {
+      await axios.post(`${BackendUrl}/move`, {
         currSquare: selectedSquare,
         newSquare: key,
         promotionPiece,
@@ -77,7 +78,7 @@ function App() {
 
   const handleReset = async () => {
     try {
-      await axios.post('http://localhost:8080/reset');
+      await axios.post(`${BackendUrl}/reset`);
       handleResetSelectedSquareData();
     } catch (err) {
       console.error(err);
@@ -93,6 +94,7 @@ function App() {
 
   useEffect(() => {
     getCurrentPositions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
